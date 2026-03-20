@@ -1,5 +1,5 @@
 import { trpc } from "@/lib/trpc";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -113,6 +113,30 @@ export default function CampaignBuilder({ onNavigate, editId }: { onNavigate: (p
   const [sending, setSending] = useState(false);
   const [testEmail, setTestEmail] = useState("");
   const [sendingTest, setSendingTest] = useState(false);
+
+  const { data: existingCampaign } = trpc.emailCampaign.campaigns.getById.useQuery(
+    { id: editId! },
+    { enabled: !!editId }
+  );
+
+  useEffect(() => {
+    if (existingCampaign) {
+      setName(existingCampaign.name ?? "");
+      setSubject(existingCampaign.subject ?? "");
+      setPreviewText(existingCampaign.previewText ?? "");
+      setFromName(existingCampaign.fromName ?? "Sponsor ComplIANS");
+      setFromEmail(existingCampaign.fromEmail ?? "info@sponsorcomplians.com");
+      setReplyTo(existingCampaign.replyTo ?? "info@sponsorcomplians.com");
+      setRecipientListId(existingCampaign.recipientListId ?? undefined);
+      if (existingCampaign.contentJson && Array.isArray(existingCampaign.contentJson)) {
+        setBlocks(existingCampaign.contentJson as EmailBlock[]);
+      }
+      if (existingCampaign.scheduledAt) {
+        setScheduledAt(new Date(existingCampaign.scheduledAt).toISOString().slice(0, 16));
+        setSendMode("schedule");
+      }
+    }
+  }, [existingCampaign]);
 
   const { data: lists } = trpc.emailCampaign.lists.listForSelect.useQuery();
   const createCampaign = trpc.emailCampaign.campaigns.create.useMutation();
@@ -321,7 +345,7 @@ export default function CampaignBuilder({ onNavigate, editId }: { onNavigate: (p
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <button onClick={() => onNavigate("campaigns")} className="p-2 rounded-lg hover:bg-gray-100 text-[#6B7280] transition-colors">
+          <button onClick={() => onNavigate("campaigns")} className="p-2 rounded-lg hover:bg-gray-100 text-[#6B7280] transition-colors" title="Back to All Campaigns">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>

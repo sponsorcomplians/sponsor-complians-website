@@ -12,6 +12,7 @@ import {
 // Import email campaign sub-pages
 import CampaignDashboard from "./CampaignDashboard";
 import CampaignBuilder from "./CampaignBuilder";
+import AllCampaigns from "./AllCampaigns";
 import TemplatesLibrary from "./TemplatesLibrary";
 import ContactLists from "./ContactLists";
 import AllContacts from "./AllContacts";
@@ -143,6 +144,11 @@ export default function EmailCampaignAdmin() {
       setActivePage(`list-detail-${listId}`);
       return;
     }
+    // Handle "campaign-edit:123" format from campaign list
+    if (page.startsWith("campaign-edit:")) {
+      setActivePage(page);
+      return;
+    }
     setActivePage(page);
   };
 
@@ -151,6 +157,7 @@ export default function EmailCampaignAdmin() {
     if (activePage.startsWith("contact-")) return "contacts";
     if (activePage.startsWith("company-name:")) return "companies";
     if (activePage.startsWith("list-detail-")) return "lists";
+    if (activePage === "campaign-new" || activePage.startsWith("campaign-edit:")) return "campaigns";
     return activePage;
   };
   const activeNavId = getActiveNavId();
@@ -158,7 +165,12 @@ export default function EmailCampaignAdmin() {
   // Parse dynamic pages
   const renderContent = () => {
     if (activePage === "dashboard") return <CampaignDashboard onNavigate={handleNavigate} />;
-    if (activePage === "campaigns") return <CampaignBuilder onNavigate={handleNavigate} />;
+    if (activePage === "campaigns") return <AllCampaigns onNavigate={handleNavigate} />;
+    if (activePage === "campaign-new") return <CampaignBuilder onNavigate={handleNavigate} />;
+    if (activePage.startsWith("campaign-edit:")) {
+      const editId = parseInt(activePage.replace("campaign-edit:", ""), 10);
+      if (!isNaN(editId)) return <CampaignBuilder onNavigate={handleNavigate} editId={editId} />;
+    }
     if (activePage === "templates") return <TemplatesLibrary onNavigate={handleNavigate} />;
     if (activePage === "lists") return <ContactLists onNavigate={handleNavigate} />;
     if (activePage === "contacts") return <AllContacts onNavigate={handleNavigate} />;
