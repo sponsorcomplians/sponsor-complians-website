@@ -5495,12 +5495,12 @@ Event: ${input.eventSlug}`
 // server/_core/context.ts
 init_db();
 import { createRemoteJWKSet, jwtVerify } from "jose";
-var CLERK_ISSUER_URL = process.env.CLERK_ISSUER_URL || "";
 var jwks = null;
 function getJWKS() {
-  if (!jwks && CLERK_ISSUER_URL) {
+  const issuer = process.env.CLERK_ISSUER_URL || "";
+  if (!jwks && issuer) {
     jwks = createRemoteJWKSet(
-      new URL(`${CLERK_ISSUER_URL}/.well-known/jwks.json`)
+      new URL(`${issuer}/.well-known/jwks.json`)
     );
   }
   return jwks;
@@ -5512,9 +5512,12 @@ async function createContext(opts) {
     if (authHeader?.startsWith("Bearer ")) {
       const token = authHeader.slice(7);
       const keys = getJWKS();
-      if (keys) {
+      const issuer = process.env.CLERK_ISSUER_URL || "";
+      if (!keys) {
+        console.warn("[Auth] JWKS not available \u2014 CLERK_ISSUER_URL:", issuer ? "set" : "MISSING");
+      } else {
         const { payload } = await jwtVerify(token, keys, {
-          issuer: CLERK_ISSUER_URL
+          issuer
         });
         const clerkUserId = payload.sub;
         if (clerkUserId) {
@@ -5537,7 +5540,8 @@ async function createContext(opts) {
         }
       }
     }
-  } catch {
+  } catch (err) {
+    console.error("[Auth] JWT verification failed:", err);
     user = null;
   }
   return {

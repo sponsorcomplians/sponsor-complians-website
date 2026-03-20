@@ -3,14 +3,13 @@ import type { User } from "../../drizzle/schema";
 import { createRemoteJWKSet, jwtVerify } from "jose";
 import * as db from "../db";
 
-const CLERK_ISSUER_URL = process.env.CLERK_ISSUER_URL || "";
-
 let jwks: ReturnType<typeof createRemoteJWKSet> | null = null;
 
 function getJWKS() {
-  if (!jwks && CLERK_ISSUER_URL) {
+  const issuer = process.env.CLERK_ISSUER_URL || "";
+  if (!jwks && issuer) {
     jwks = createRemoteJWKSet(
-      new URL(`${CLERK_ISSUER_URL}/.well-known/jwks.json`)
+      new URL(`${issuer}/.well-known/jwks.json`)
     );
   }
   return jwks;
@@ -32,9 +31,13 @@ export async function createContext(
     if (authHeader?.startsWith("Bearer ")) {
       const token = authHeader.slice(7);
       const keys = getJWKS();
-      if (keys) {
+      const issuer = process.env.CLERK_ISSUER_URL || "";
+
+      if (!keys) {
+        console.warn("[Auth] JWKS not available — CLERK_ISSUER_URL:", issuer ? "set" : "MISSING");
+      } else {
         const { payload } = await jwtVerify(token, keys, {
-          issuer: CLERK_ISSUER_URL,
+          issuer,
         });
         const clerkUserId = payload.sub;
         if (clerkUserId) {
@@ -57,7 +60,8 @@ export async function createContext(
         }
       }
     }
-  } catch {
+  } catch (err) {
+    console.error("[Auth] JWT verification failed:", err);
     user = null;
   }
 
