@@ -8,7 +8,8 @@ import {
   Type, Image, MousePointerClick, Minus, Columns2, Columns3,
   Link2, Share2, MessageSquare, Quote, Calendar, Podcast, Newspaper,
   GripVertical, Eye, Smartphone, Monitor, Moon, Send, Clock,
-  AlertTriangle, ChevronDown, ChevronUp, ExternalLink,
+  AlertTriangle, ChevronDown, ChevronUp, ExternalLink, Sparkles,
+  RotateCcw, CheckCircle2, PlusCircle, X,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -113,6 +114,10 @@ export default function CampaignBuilder({ onNavigate, editId }: { onNavigate: (p
   const [sending, setSending] = useState(false);
   const [testEmail, setTestEmail] = useState("");
   const [sendingTest, setSendingTest] = useState(false);
+  const [aiPrompt, setAiPrompt] = useState("");
+  const [aiTone, setAiTone] = useState<"professional" | "friendly" | "urgent" | "educational" | "promotional">("professional");
+  const [generatingContent, setGeneratingContent] = useState(false);
+  const [aiGeneratedBlocks, setAiGeneratedBlocks] = useState<EmailBlock[] | null>(null);
 
   const { data: existingCampaign } = trpc.emailCampaign.campaigns.getById.useQuery(
     { id: editId! },
@@ -145,6 +150,53 @@ export default function CampaignBuilder({ onNavigate, editId }: { onNavigate: (p
   const sendCampaign = trpc.emailCampaign.campaigns.send.useMutation();
   const scheduleCampaign = trpc.emailCampaign.campaigns.schedule.useMutation();
   const sendTestMutation = trpc.emailCampaign.campaigns.sendTest.useMutation();
+  const generateContentMutation = trpc.emailCampaign.campaigns.generateEmailContent.useMutation();
+
+  const handleGenerateContent = async () => {
+    if (!aiPrompt.trim()) { toast.error("Describe what you want in the email"); return; }
+    setGeneratingContent(true);
+    try {
+      const result = await generateContentMutation.mutateAsync({
+        prompt: aiPrompt,
+        tone: aiTone,
+        campaignName: name || undefined,
+      });
+      const generated = (result.blocks || []).map((b: any) => ({
+        id: generateId(),
+        type: b.type,
+        content: b.content,
+      }));
+      if (generated.length > 0) {
+        setAiGeneratedBlocks(generated);
+      } else {
+        toast.error("AI returned no content. Try rephrasing your prompt.");
+      }
+    } catch {
+      toast.error("Failed to generate content");
+    } finally {
+      setGeneratingContent(false);
+    }
+  };
+
+  const handleApplyAiContent = (mode: "replace" | "append") => {
+    if (!aiGeneratedBlocks) return;
+    if (mode === "replace") {
+      setBlocks(aiGeneratedBlocks);
+    } else {
+      const footerIdx = blocks.findIndex(b => b.type === "footer");
+      if (footerIdx > 0) {
+        const before = blocks.slice(0, footerIdx);
+        const after = blocks.slice(footerIdx);
+        const newBlocks = aiGeneratedBlocks.filter(b => b.type !== "header" && b.type !== "footer" && b.type !== "social");
+        setBlocks([...before, ...newBlocks, ...after]);
+      } else {
+        setBlocks([...blocks, ...aiGeneratedBlocks]);
+      }
+    }
+    setAiGeneratedBlocks(null);
+    setAiPrompt("");
+    toast.success(`AI content ${mode === "replace" ? "applied" : "appended"}`);
+  };
 
   // Generate email HTML from blocks
   const generateHtmlFromBlocks = (blockList: EmailBlock[]): string => {
@@ -628,8 +680,78 @@ export default function CampaignBuilder({ onNavigate, editId }: { onNavigate: (p
             </div>
           </div>
 
-          {/* Right Sidebar - Block Palette + Quick Links */}
+          {/* Right Sidebar - AI + Block Palette + Quick Links */}
           <div className="space-y-4">
+            {/* AI Assistant */}
+            <div className="bg-gradient-to-br from-[#0f172a] to-[#1e293b] rounded-xl shadow-sm p-4 border border-[#1B3A5C]/30">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
+                  <Sparkles className="w-4 h-4 text-white" />
+                </div>
+                <h3 className="font-semibold text-white text-sm">AI Assistant</h3>
+              </div>
+              <textarea
+                value={aiPrompt}
+                onChange={e => setAiPrompt(e.target.value)}
+                placeholder="Describe the email you want, e.g. 'A newsletter about the latest Home Office compliance changes with a CTA to book an audit'"
+                className="w-full rounded-lg bg-white/10 border border-white/10 text-white placeholder-slate-400 text-xs p-2.5 resize-none focus:outline-none focus:ring-2 focus:ring-violet-500/40"
+                rows={3}
+              />
+              <div className="mt-2">
+                <label className="block text-[10px] text-slate-400 mb-1">Tone</label>
+                <select
+                  value={aiTone}
+                  onChange={e => setAiTone(e.target.value as any)}
+                  className="w-full rounded-lg bg-white/10 border border-white/10 text-white text-xs px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-violet-500/40 [&>option]:text-[#1F2937]"
+                >
+                  <option value="professional">Professional</option>
+                  <option value="friendly">Friendly</option>
+                  <option value="urgent">Urgent</option>
+                  <option value="educational">Educational</option>
+                  <option value="promotional">Promotional</option>
+                </select>
+              </div>
+              <button
+                onClick={handleGenerateContent}
+                disabled={generatingContent || !aiPrompt.trim()}
+                className="w-full mt-3 flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white text-xs font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {generatingContent ? (
+                  <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Generating...</>
+                ) : (
+                  <><Sparkles className="w-3.5 h-3.5" /> Generate Email Content</>
+                )}
+              </button>
+              {aiGeneratedBlocks && (
+                <div className="mt-3 space-y-2">
+                  <div className="flex items-center gap-1.5">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                    <span className="text-emerald-400 text-[10px] font-medium">{aiGeneratedBlocks.length} blocks generated</span>
+                  </div>
+                  <div className="flex gap-1.5">
+                    <button
+                      onClick={() => handleApplyAiContent("replace")}
+                      className="flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 text-[10px] font-medium transition-colors"
+                    >
+                      <RotateCcw className="w-3 h-3" /> Replace All
+                    </button>
+                    <button
+                      onClick={() => handleApplyAiContent("append")}
+                      className="flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 text-[10px] font-medium transition-colors"
+                    >
+                      <PlusCircle className="w-3 h-3" /> Append
+                    </button>
+                    <button
+                      onClick={() => setAiGeneratedBlocks(null)}
+                      className="flex items-center justify-center px-2 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 text-[10px] font-medium transition-colors"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
             {/* Add Blocks */}
             <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
               <h3 className="font-semibold text-[#1F2937] text-sm mb-3">Add Block</h3>

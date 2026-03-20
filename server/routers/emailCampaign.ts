@@ -94,6 +94,96 @@ export const emailCampaignRouter = router({
       }
     }),
 
+    generateEmailContent: adminProcedure.input(z.object({
+      prompt: z.string().min(1),
+      tone: z.enum(["professional", "friendly", "urgent", "educational", "promotional"]).optional(),
+      campaignName: z.string().optional(),
+    })).mutation(async ({ input }) => {
+      try {
+        const toneGuide: Record<string, string> = {
+          professional: "Use a formal, authoritative tone suitable for HR directors and business owners.",
+          friendly: "Use a warm, approachable tone that feels personal and conversational.",
+          urgent: "Create urgency with time-sensitive language. Emphasise deadlines and consequences of inaction.",
+          educational: "Use an informative, teaching tone. Include facts, statistics, and actionable advice.",
+          promotional: "Use persuasive marketing language. Highlight benefits, social proof, and clear CTAs.",
+        };
+
+        const response = await invokeLLM({
+          messages: [
+            {
+              role: "system",
+              content: `You are an expert email designer for Sponsor ComplIANS, a UK sponsor licence compliance consultancy. Generate email content as a JSON array of blocks.
+
+Available block types and their content fields:
+- "header": { "title": string }
+- "text": { "html": "<p>...</p>" } (use HTML tags: <p>, <strong>, <em>, <ul>, <li>, <a href>)
+- "button": { "text": string, "url": string, "color": "#0d9488" }
+- "divider": { "style": "solid" }
+- "cta_card": { "headline": string, "description": string, "buttonText": string, "buttonUrl": string }
+- "testimonial": { "quote": string, "name": string, "company": string }
+- "blog_card": { "title": string, "excerpt": string, "url": string }
+- "event_card": { "date": string, "title": string, "description": string, "registerUrl": string }
+- "podcast_card": { "title": string, "description": string, "listenUrl": string }
+- "social": { "linkedin": "https://linkedin.com/company/sponsorcomplians", "facebook": "https://facebook.com/profile.php?id=61572202899701", "instagram": "https://instagram.com/sponsorcomplians", "youtube": "https://youtube.com/channel/UCWCUNlwdJzgHtkC-pzKWJbg" }
+- "footer": { "companyName": "Sponsor ComplIANS", "address": "915 High Road, North Finchley, London N12 8QJ", "phone": "020 3618 6968", "email": "info@sponsorcomplians.com" }
+
+Key URLs for links:
+- Homepage: https://sponsorcomplians.com/
+- Compliance Audit: https://sponsorcomplians.com/sponsor-compliance-audit
+- Recruitment: https://sponsorcomplians.com/skilled-worker-recruitment-solutions
+- HR Services: https://sponsorcomplians.com/sponsor-hr-services
+- Hub Software: https://sponsorcomplians.com/sponsor-complians-hub
+- Hub Demo: https://sponsorcomplians.com/hub-demo
+- Podcast: https://sponsorcomplians.com/the-sponsorship-files
+- Blog: https://sponsorcomplians.com/blog
+- Book Consultation: https://sponsorcomplians.com/book-consultation
+- Contact: https://sponsorcomplians.com/contact
+
+Rules:
+1. ALWAYS start with a "header" block and end with "social" then "footer" blocks.
+2. Use personalisation tokens like {{first_name}}, {{company_name}} where appropriate.
+3. Generate 6-10 blocks for a well-structured email.
+4. Write compelling copy about UK sponsor licence compliance, immigration, HR.
+5. Include at least one CTA (button or cta_card).
+6. Return ONLY valid JSON — an array of objects with "type" and "content" fields. No markdown, no explanation.
+${input.tone ? toneGuide[input.tone] || "" : ""}`
+            },
+            {
+              role: "user",
+              content: `Generate email content blocks for: ${input.prompt}${input.campaignName ? `\nCampaign name: ${input.campaignName}` : ""}${input.tone ? `\nTone: ${input.tone}` : ""}`
+            }
+          ],
+          responseFormat: { type: "json_object" },
+        });
+
+        const rawContent = response.choices?.[0]?.message?.content || "[]";
+        const text = typeof rawContent === "string" ? rawContent : "";
+        let blocks: any[];
+        try {
+          const parsed = JSON.parse(text);
+          blocks = Array.isArray(parsed) ? parsed : parsed.blocks || parsed.content || [];
+        } catch {
+          blocks = [];
+        }
+
+        const validTypes = ["header", "text", "image", "button", "divider", "columns2", "columns3", "social", "footer", "cta_card", "testimonial", "blog_card", "event_card", "podcast_card"];
+        blocks = blocks.filter((b: any) => b && b.type && validTypes.includes(b.type) && b.content);
+
+        return { blocks };
+      } catch (err: any) {
+        console.error("[AI Email Content]", err);
+        return {
+          blocks: [
+            { type: "header", content: { title: "Sponsor ComplIANS" } },
+            { type: "text", content: { html: "<p>Hi {{first_name}},</p><p>We have exciting updates to share with you about sponsor licence compliance.</p>" } },
+            { type: "cta_card", content: { headline: "Book Your Free Audit", description: "Ensure your organisation is fully compliant with the latest Home Office requirements.", buttonText: "Book Now", buttonUrl: "https://sponsorcomplians.com/book-consultation" } },
+            { type: "social", content: { linkedin: "https://linkedin.com/company/sponsorcomplians", facebook: "https://facebook.com/profile.php?id=61572202899701", instagram: "https://instagram.com/sponsorcomplians", youtube: "https://youtube.com/channel/UCWCUNlwdJzgHtkC-pzKWJbg" } },
+            { type: "footer", content: { companyName: "Sponsor ComplIANS", address: "915 High Road, North Finchley, London N12 8QJ", phone: "020 3618 6968", email: "info@sponsorcomplians.com" } },
+          ]
+        };
+      }
+    }),
+
     // Campaign analytics
     analytics: adminProcedure.query(async () => {
       return ecDb.getCampaignAnalytics();
