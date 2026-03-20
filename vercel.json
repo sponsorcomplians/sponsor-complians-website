@@ -1,13 +1,12 @@
 {
   "buildCommand": "pnpm run build",
   "outputDirectory": "dist/public",
-  "installCommand": "pnpm install",
-  "framework": null,
   "rewrites": [
-    { "source": "/api/trpc/(.*)", "destination": "/api" },
-    { "source": "/api/stripe/(.*)", "destination": "/api" },
-    { "source": "/api/sendgrid/(.*)", "destination": "/api" },
-    { "source": "/api/booking/(.*)", "destination": "/api" },
+    { "source": "/api/trpc/:path*", "destination": "/api" },
+    { "source": "/api/oauth/:path*", "destination": "/api" },
+    { "source": "/api/stripe/:path*", "destination": "/api" },
+    { "source": "/api/sendgrid/:path*", "destination": "/api" },
+    { "source": "/api/booking/:path*", "destination": "/api" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
