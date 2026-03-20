@@ -120,6 +120,7 @@ export default function CampaignBuilder({ onNavigate, editId }: { onNavigate: (p
   const [aiGeneratedBlocks, setAiGeneratedBlocks] = useState<EmailBlock[] | null>(null);
   const [showHtmlPaste, setShowHtmlPaste] = useState(true);
   const [pastedHtml, setPastedHtml] = useState("");
+  const [rawHtmlContent, setRawHtmlContent] = useState<string | null>(null);
 
   const { data: existingCampaign } = trpc.emailCampaign.campaigns.getById.useQuery(
     { id: editId! },
@@ -290,7 +291,7 @@ export default function CampaignBuilder({ onNavigate, editId }: { onNavigate: (p
     if (!name) { toast.error("Campaign name is required"); return; }
     setSaving(true);
     try {
-      const contentHtml = generateHtmlFromBlocks(blocks);
+      const contentHtml = rawHtmlContent || generateHtmlFromBlocks(blocks);
       let campaignId = editId;
 
       if (editId) {
@@ -529,9 +530,34 @@ export default function CampaignBuilder({ onNavigate, editId }: { onNavigate: (p
               <button onClick={() => setPreviewMode("dark")} className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium transition-colors ${previewMode === "dark" ? "bg-[#0d9488] text-white" : "text-[#6B7280] hover:bg-gray-100"}`}>
                 <Moon className="w-3.5 h-3.5" /> Dark
               </button>
+              {rawHtmlContent && (
+                <div className="ml-auto flex items-center gap-2">
+                  <Badge variant="outline" className="bg-violet-50 text-violet-600 border-violet-200 text-[10px]">
+                    <Code2 className="w-3 h-3 mr-1" /> Custom HTML Mode
+                  </Badge>
+                  <button
+                    onClick={() => { setRawHtmlContent(null); }}
+                    className="flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium text-red-500 hover:bg-red-50 transition-colors"
+                  >
+                    <X className="w-3 h-3" /> Exit HTML Mode
+                  </button>
+                </div>
+              )}
             </div>
 
-            {/* Email Canvas */}
+            {/* Raw HTML Preview (when custom HTML is pasted) */}
+            {rawHtmlContent ? (
+              <div className={`rounded-xl border border-gray-100 shadow-sm overflow-hidden ${previewMode === "mobile" ? "max-w-[375px] mx-auto" : ""} ${previewMode === "dark" ? "bg-[#1a1a2e]" : "bg-[#F5F7FA]"}`}>
+                <iframe
+                  srcDoc={rawHtmlContent}
+                  title="Email Preview"
+                  className="w-full border-0"
+                  style={{ minHeight: "600px" }}
+                  sandbox="allow-same-origin"
+                />
+              </div>
+            ) : (
+            /* Block Editor Canvas */
             <div className={`bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden ${previewMode === "mobile" ? "max-w-[375px] mx-auto" : ""} ${previewMode === "dark" ? "bg-[#1a1a2e]" : ""}`}>
               <div className="p-4 space-y-3">
                 {blocks.map((block, idx) => (
@@ -671,6 +697,7 @@ export default function CampaignBuilder({ onNavigate, editId }: { onNavigate: (p
                 ))}
               </div>
             </div>
+            )}
 
             {/* Navigation */}
             <div className="flex justify-between">
@@ -873,18 +900,8 @@ export default function CampaignBuilder({ onNavigate, editId }: { onNavigate: (p
                 <Button
                   onClick={() => {
                     if (!pastedHtml.trim()) { toast.error("Paste some HTML first"); return; }
-                    setBlocks([{
-                      id: generateId(),
-                      type: "header",
-                      content: { title: "Sponsor ComplIANS" },
-                    }]);
-                    const textBlock: EmailBlock = {
-                      id: generateId(),
-                      type: "text" as const,
-                      content: { html: pastedHtml.trim() },
-                    };
-                    setBlocks([textBlock]);
-                    toast.success("HTML applied — switch to Review to see the full preview");
+                    setRawHtmlContent(pastedHtml.trim());
+                    toast.success("HTML applied — you can see the preview above");
                     setPastedHtml("");
                   }}
                   className="bg-[#0d9488] hover:bg-[#0d9488]/90 text-white gap-2 text-sm"
@@ -918,13 +935,13 @@ export default function CampaignBuilder({ onNavigate, editId }: { onNavigate: (p
                 <Button
                   variant="outline"
                   onClick={() => {
-                    const html = generateHtmlFromBlocks(blocks);
-                    setPastedHtml(html);
-                    toast.success("Current email HTML loaded into editor");
+                    const html = rawHtmlContent || generateHtmlFromBlocks(blocks);
+                    navigator.clipboard.writeText(html);
+                    toast.success("HTML copied to clipboard");
                   }}
                   className="gap-2 text-sm ml-auto"
                 >
-                  <Code2 className="w-4 h-4" /> Copy Current HTML
+                  <Code2 className="w-4 h-4" /> Copy HTML
                 </Button>
               </div>
               <p className="text-[10px] text-[#9CA3AF]">
