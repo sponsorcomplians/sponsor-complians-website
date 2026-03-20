@@ -118,7 +118,7 @@ export default function CampaignBuilder({ onNavigate, editId }: { onNavigate: (p
   const [aiTone, setAiTone] = useState<"professional" | "friendly" | "urgent" | "educational" | "promotional">("professional");
   const [generatingContent, setGeneratingContent] = useState(false);
   const [aiGeneratedBlocks, setAiGeneratedBlocks] = useState<EmailBlock[] | null>(null);
-  const [showHtmlPaste, setShowHtmlPaste] = useState(false);
+  const [showHtmlPaste, setShowHtmlPaste] = useState(true);
   const [pastedHtml, setPastedHtml] = useState("");
 
   const { data: existingCampaign } = trpc.emailCampaign.campaigns.getById.useQuery(
