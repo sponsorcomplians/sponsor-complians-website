@@ -1,0 +1,1 @@
+ALTER TABLE `contacts` MODIFY COLUMN `source` enum('contact_form','newsletter','signup','download','manual','consultation','other') NOT NULL DEFAULT 'other';

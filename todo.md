@@ -1,0 +1,325 @@
+# Project TODO
+
+- [x] Upload 6 portfolio screenshots to CDN
+- [x] Update Provider Websites "Websites We've Built" portfolio section with all 6 screenshots
+- [x] Add Podcast Platform filter tab to portfolio
+- [x] Create webinarRegistrations database table
+- [x] Add webinar registration tRPC route and db helpers
+- [x] Build Event Page 1: New Website Launch (/events/new-website-launch)
+- [x] Build Event Page 2: 25 March Webinar (/events/25-march-webinar) with registration form and countdown
+- [x] Build Event Page 3: Sponsorship Files Podcast Launch (/events/sponsorship-files-launch)
+- [x] Build Event Page 4: Hub Launch (/events/hub-launch) with countdown, pricing, FAQ
+- [x] Add 4 new event routes to App.tsx
+- [x] Add Featured Events section to Events page with 4 event cards
+- [x] Replace portfolio screenshot 2 image with screenshot 1 (Divine Health homepage)
+- [x] Review and explain admin dashboard login flow to user
+- [x] Add discreet admin link in footer visible only to admin users
+- [x] Add Webinar Registrations tab to admin dashboard
+- [x] Add email notification integration for webinar registrations and contact form submissions
+- [x] Add header images to the 4 Featured Events cards on the Events page
+- [x] Add visible Log In link to footer for unauthenticated users
+- [x] Fix admin dashboard Overview page - empty content area below stat cards
+- [x] Replace broken image on Sponsor-Ready HR Service page hero with uploaded team photo
+- [x] Replace Skilled Worker Recruitment page hero image with thumbs-up photo
+- [x] Replace Recruitment page hero image with smiling woman photo
+- [x] Fix admin dashboard Messages panel top padding issue
+- [x] Admin dashboard: switch to light theme (white/light grey background)
+- [x] Admin dashboard: fix stat cards top padding and 3-column grid layout
+- [x] Admin dashboard: fix Recent Contacts and Recent Messages equal-width 2-column grid
+- [x] Admin dashboard: fix Webinar Registrations and Quick Actions equal-width aligned grid
+- [x] Admin dashboard: consistent 24px spacing, 20-24px card inner padding
+- [x] Admin dashboard: typography cleanup (titles 16px semibold, stats 28-32px bold, list items 14px)
+- [x] Admin dashboard: keep accent colours (cyan/teal, coloured avatars, cyan CTA)
+- [x] Admin dashboard: ensure sidebar doesn't overlap content area
+- [x] Full website front-end audit: map all pages, forms, CTAs, downloads, signups
+- [x] Full admin dashboard backend audit: verify all sections and data flow
+- [x] Cross-reference front-end elements with backend and produce gap analysis report
+- [x] Add SW Sponsorship/Job Application Form screenshot to ComplIANS Jobs hero banner
+- [x] Replace generic POWER theme screenshot in Audit page Compliance Dashboard section with actual audit report screenshot
+- [x] Fix email from info@sponsorcomplians.co.uk to admin@sponsorcomplians.com across all pages
+- [x] Fix all module section links to point to correct pages/sections
+- [x] Fix homepage What We Do module card Learn More links to point to correct pages (verified: all 6 links correct)
+- [x] Slow down testimonial carousel speed so users can read each testimonial (50s→120s, 55s→130s)
+- [x] Fix footer Solutions links — added ScrollToTop component so pages load at top instead of preserving scroll
+- [x] Fix footer Resources links — ScrollToTop fix applies to all navigation
+- [x] Slow down testimonial carousel speed (duplicate — covered above)
+- [x] Fix "Get Your First Hire Free" CTA on Recruitment page — already links to /contact correctly
+- [x] Fix "See Recruitment Plans" CTA on Recruitment page — added id="pricing" to pricing section so #pricing anchor works
+- [x] Add documents/lead magnets database table for admin-uploaded files (already existed in schema)
+- [x] Build server-side API for document upload, list, edit, delete (admin only)
+- [x] Build admin panel Documents Management UI with upload, categorise, edit, delete
+- [x] Update Downloads page to pull documents from the new system (already connected via trpc.downloads.list)
+- [x] Write tests for document upload and management endpoints (7 tests passing)
+- [x] Build Jobs Management panel in admin dashboard with review, approve, reject, edit, delete
+- [x] Add admin endpoints for job management (approve, reject, update status, delete)
+- [x] Build Chatbot Conversations panel in admin dashboard with conversation list and message threads
+- [x] Add admin endpoints for chatbot conversation viewing and management
+- [x] Build team member invitation system for admin backend access
+- [x] Add invite/role management endpoints and UI
+- [x] Create Privacy Policy page (/privacy-policy) for GDPR compliance
+- [x] Create Terms of Service page (/terms) with comprehensive legal terms
+- [x] Add routes for Privacy Policy and Terms of Service in App.tsx
+- [x] Write tests for team management (8 tests) and chatbot (2 tests) — 36 total tests passing
+- [x] Add 3 compliance pre-qualification columns to jobs table (sponsorLicenceStatus, cosAvailability, homeOfficeInspection, inspectionOutcomeDetail)
+- [x] Update job posting form with 3 new dropdown fields between Sponsorship Offered and Job Description
+- [x] Add conditional textarea for inspection outcome when "action plan" or "downgraded" selected
+- [x] Update backend routers and db helpers to accept and store new fields
+- [x] Display compliance fields in admin Jobs Management panel
+- [x] Add red warning badges in admin panel for flagged compliance responses
+- [x] Update job submission confirmation email to mention compliance review
+- [x] Write tests for new compliance fields (8 tests, 44 total passing)
+- [x] Increase Jobs page hero image (job application form) size by 3x
+- [x] Replace screenshot 2 on Provider Websites page with Sponsor Complians Hub unified inbox image
+- [x] Replace homepage hero banner images with Sponsor Complians Hub dashboard screenshot
+- [x] Add subtle hover animation (scale + glow) and scroll parallax to hero dashboard image
+- [x] Add video walkthrough CTA overlay on the hero dashboard image
+- [x] Create dedicated Hub demo page (/hub-demo) with screenshots and platform features
+- [x] Link hero image to Hub demo page and add route in App.tsx
+- [x] Add Hub Demo link to Solutions dropdown in TopNav with New badge
+- [x] Add scroll-triggered parallax to hero dashboard image on homepage (translateY + rotate3d)
+- [x] Replace video Coming Soon modal with HeyGen-style video player (placeholder until footage recorded) — 59 total tests passing
+- [x] Add email capture form to video placeholder for early access notifications (GDPR compliant)
+- [x] Add Watch Demo CTA button on /sponsor-complians-hub page that triggers video player modal
+- [x] Add Book a Live Demo button that appears automatically after video ends — 64 total tests passing
+- [x] Add subscriber count card to admin dashboard for video early access signups
+- [x] Set up automated email endpoint to notify hub_video_early_access subscribers upon video release
+- [x] Create key features showcase section on Hub Demo page with 9 feature cards and descriptions — 74 total tests passing
+- [x] Add test subscriber to Video Early Access to verify counter works
+- [x] Move Video Early Access stat card to more prominent position on admin dashboard (now featured card with gradient at top of Overview)
+- [x] Add Video Early Access subscriber breakdown by date on admin dashboard (with date grouping and recent subscriber list) — 77 total tests passing
+- [x] Full website audit: every page, feature, function from prospect perspective
+- [x] Evaluate information accuracy and clarity across all pages
+- [x] Assess user intent alignment for each page/feature
+- [x] Score visitor behaviour tracking and interaction speed
+- [x] Compile comprehensive audit report with findings and recommendations
+- [x] Part 1: Fix "1,000+" → "100+" on Events, Webinar, Hub Launch pages (3 files, 4 instances)
+- [x] Part 1: Remove "100+ Sites Built" badge from Provider Websites → replaced with "Featured Client: Divine Health Services"
+- [x] Part 1: Fix "4.9/5 Client Rating" → replaced with "100+ Audits Completed" (verifiable)
+- [x] Part 2: Replace homepage "WATCH PRODUCT TOUR" with "See It Live — Free Webinar 25 March" → links to /events/25-march-webinar
+- [x] Part 2: Replace Hub page "Watch Demo" with webinar CTA link
+- [x] Part 2: Update Hub Demo page video placeholders with webinar messaging + registration prompt
+- [x] Part 3: Build sticky webinar announcement bar with countdown on every page (teal #00C9A7, countdown timer, dismiss X, session persistence)
+- [x] Part 4: Add GDPR consent checkbox to contact form
+- [x] Part 4: Add GDPR consent checkbox to newsletter form (both hero + bottom CTA)
+- [x] Part 4: Add GDPR consent checkbox to job posting form
+- [x] Part 4: Add GDPR consent checkbox to webinar registration form
+- [x] Part 4: Add GDPR consent checkbox to video early access form (HubDemo modal)
+- [ ] Part 4: Verify cookie consent banner appears on first load
+- [ ] Part 4: Update Privacy Policy with company registration placeholder
+- [x] Part 5: Add urgency triage dropdown to contact form as first field (5 options)
+- [x] Part 5: Add emergency red banner for Home Office email option (with phone number + 20 working day warning)
+- [ ] Part 5: Store enquiry type in database
+- [x] Part 6: Add Founding Member pricing section to Hub product page (£29/worker/month, 50% off £58)
+- [x] Part 6: Add countdown to 1 April and "Lock In" CTA (live countdown timer + webinar registration link)
+- [x] Part 7: Add email capture to IANS chatbot after first response (instruction 12 in system prompt)
+- [x] Part 7: Update IANS system prompt with Founding Member pricing, webinar promotion, and email capture instructions
+- [x] Part 8: Remove duplicate "ComplIANS Jobs" from Solutions dropdown
+- [x] Part 8: Rename "Provider Websites" to "Client Showcase" in Solutions dropdown
+- [x] Part 8: Add newsletter signup to blog listing page (inline variant) and blog post sidebar (card variant)
+- [x] Part 8: Move Careers to footer only (removed from top nav, already in footer)
+- [x] Follow-up 1: Integrate Calendly with "Book Free Consultation" button for self-scheduling (CalendlyModal on Contact + BlogPost)
+- [x] Follow-up 2: Build visitor behaviour scoring system — backend tracking + admin dashboard with Cold/Warm/Hot classification (DB tables, tracking hook, scoring logic, admin panel with stats/leads/events)
+- [x] Follow-up 3: Build config-driven video CTA swap mechanism — ctaConfig.ts controls all CTAs across Home, HubSoftware, HubDemo, AnnouncementBar (change MODE to "video" to switch)
+- [x] Follow-up 4: Create reusable skill from the audit-to-implementation process (website-audit-implementation skill validated)
+- [x] Fix: Webinar announcement bar covering the navigation menu (fixed: wrapped in sticky header with proper z-index layering)
+- [x] Fix: Rename "Client Showcase" to "Sponsor Compliance Website Service" in nav dropdown
+- [x] Fix: Update Provider Websites page to show 4 showcase cards: sponsorcomplians.com, sponsorcomplianshub.com, sponsorcompliansdivinecare.com, sponsorshipfiles.com (replaced 13-item masonry grid with clean 2x2 showcase)
+
+## Built-in Appointment Booking System (Better than Calendly/HubSpot)
+- [x] DB schema: appointments table with status lifecycle (pending/confirmed/completed/cancelled/no-show)
+- [x] DB schema: availability_slots table for admin to set recurring weekly availability
+- [x] DB schema: booking_rules table for buffer time, max daily bookings, advance notice
+- [x] Backend: availability engine — compute open slots from availability minus existing bookings
+- [x] Backend: booking logic with double-booking prevention and race condition handling
+- [x] Backend: automatic email notifications (confirmation, reminder, reschedule, cancellation) — owner notification via notifyOwner()
+- [x] Backend: appointment status management (confirm, reschedule, cancel, mark no-show)
+- [x] Frontend: public booking page — Step 1: select consultation type
+- [x] Frontend: public booking page — Step 2: calendar date picker showing available dates
+- [x] Frontend: public booking page — Step 3: time slot selection with smart grouping (morning/afternoon)
+- [x] Frontend: public booking page — Step 4: contact details + urgency context + GDPR consent
+- [x] Frontend: public booking page — Step 5: confirmation with calendar download (.ics)
+- [x] Frontend: admin panel — availability management (set weekly hours, block dates, buffer time)
+- [x] Frontend: admin panel — appointment list with filters (upcoming/past/cancelled)
+- [x] Frontend: admin panel — reschedule/cancel with automatic notification
+- [x] Frontend: admin panel — booking analytics (conversion rate, popular times, no-show rate)
+- [x] Integration: wire lead scoring — booking = +25 points, completed = +15 more
+- [x] Integration: replace CalendlyModal with built-in booking on Contact + BlogPost — all CTAs now link to /book-consultation
+- [x] Integration: add booking CTA to IANS chatbot responses — chatbot already recommends /book-consultation
+- [x] Tests: write comprehensive vitest tests for booking logic — 18 booking tests, 95 total passing
+- [x] Move webinar announcement bar from top of page to below hero banner, above second section
+- [x] SW001 Feature Page: Study hub-demo page design patterns to replicate
+- [x] SW001 Feature Page: Upload all 10 screenshots to CDN
+- [x] SW001 Feature Page: Build hero section with heading, subheading, intro paragraph
+- [x] SW001 Feature Page: Build horizontal tab navigation (10 tabs with smooth scroll)
+- [x] SW001 Feature Page: Build all 10 feature sections with alternating layout, stat cards, badges
+- [x] SW001 Feature Page: Build platform capabilities bar
+- [x] SW001 Feature Page: Build coming soon footer section with module preview grid
+- [x] SW001 Feature Page: Register route in App.tsx and add to navigation
+- [x] SW001 Feature Page: Write vitest tests — 14 tests, 109 total passing
+- [x] Fix: Solutions dropdown missing "Sponsor Compliance Audit" menu item — was hidden behind ticker, not missing from code
+- [x] Fix: Solutions dropdown being covered/overlapped by the news ticker (z-index issue) — added z-[60] to dropdown panel
+- [x] Fix: Sponsor Compliance Audit still hidden in Solutions dropdown — fixed TopNav z-20 above Ticker z-10 within fixed container
+- [x] Fix: Broken sponsorcomplianshub.com link on Provider Websites showcase — redirected Hub card to internal /sponsor-complians-hub page with Platform Launch badge
+
+## SW001 → Hub Demo Merge
+- [x] Merge all 10 SW001 sections into Hub Demo page (16 total sections: 6 hub + 10 SW001)
+- [x] Add "See the Full Hub" hero CTA button linking to /sponsor-complians-hub
+- [x] Increase all screenshot sizes (max-w-2xl, larger module number badges)
+- [x] Add Coming Soon section with 15 module cards (SW002–SW065)
+- [x] Add final CTA section "Ready to See the Hub in Action?"
+- [x] Remove separate SW001 route — redirect /features/sw001 to /hub-demo
+- [x] Remove SW001 nav item from Solutions dropdown (content now in Hub Demo)
+- [x] All 109 tests passing, no TypeScript errors
+
+## Email Campaign Tool (Full CRM + Email Marketing System)
+- [x] DB schema: campaigns table (name, subject, preview_text, from_name, from_email, reply_to, content_json, status, scheduled_at, sent_at, recipients_count, stats)
+- [x] DB schema: email_templates table (name, category, content_json, thumbnail_url)
+- [x] DB schema: enhanced contacts table (add phone, mobile, job_title, linkedin, address, city, postcode, secondary_email, custom_fields, engagement_score, gdpr_consent_date)
+- [x] DB schema: enhanced companies table (already existed in schema)
+- [x] DB schema: contact_tags, company_tags, lists, list_members tables
+- [x] DB schema: contact_notes, contact_tasks tables
+- [x] DB schema: deals table (company_id, stage, value, expected_close, product_interest, notes)
+- [x] DB schema: campaign_recipients, campaign_events (opens, clicks, bounces, unsubscribes) tables
+- [x] DB schema: automations, automation_steps, automation_enrollments tables
+- [x] DB schema: daily_email_drafts, content_sources, content_items tables
+- [x] DB schema: email_settings table
+- [x] Backend: campaign CRUD routes (create, list, get, update, delete, duplicate)
+- [x] Backend: campaign send/schedule routes with email service integration
+- [x] Backend: template CRUD routes (with duplicate)
+- [x] Backend: enhanced contact CRUD with full CRM fields, notes, tasks, activity timeline
+- [x] Backend: enhanced company CRUD with deals pipeline, associated contacts
+- [ ] Backend: CSV import wizard routes (upload, field mapping, preview, execute) — future enhancement
+- [x] Backend: contact/company tag and list management routes
+- [x] Backend: engagement scoring calculation logic (stored in contact schema)
+- [x] Backend: automation CRUD and enrollment/execution engine
+- [x] Backend: analytics aggregation routes (campaign stats, subscriber analytics, comparisons)
+- [x] Backend: AI daily email generation route (content scanning, LLM draft, approval workflow)
+- [x] Backend: email settings CRUD
+- [x] Frontend: Campaign Dashboard page with KPI cards, recent campaigns table, quick actions
+- [x] Frontend: Campaign Builder — Step 1 Setup (name, subject, AI subject generator, recipients)
+- [x] Frontend: Campaign Builder — Step 2 Design (email editor with blocks, templates, Quick Links panel, personalisation tokens, preview)
+- [x] Frontend: Campaign Builder — Step 3 Review & Send (summary, schedule, spam check)
+- [x] Frontend: Templates Library page (grid view, CRUD, categories, duplicate)
+- [x] Frontend: Enhanced Contacts list with search, filter, sort, bulk actions (import wizard — future)
+- [x] Frontend: Contact profile page with full CRM fields, activity timeline, email history, notes, tasks
+- [ ] Frontend: Enhanced Companies list with search, filter, sort, bulk actions — future enhancement
+- [ ] Frontend: Company profile page with details, associated contacts, deals pipeline, activity — future enhancement
+- [ ] Frontend: Deals Kanban board view — future enhancement
+- [x] Frontend: Automation Flows page with visual builder and pre-built automations
+- [x] Frontend: Analytics Dashboard with KPIs, charts, campaign reports, subscriber analytics, comparisons
+- [x] Frontend: Individual Campaign Report page (open rate chart, click map, device breakdown, etc.)
+- [x] Frontend: AI Daily Email page (content sources config, daily drafts, approval workflow, settings)
+- [x] Frontend: Email Settings page
+- [x] Frontend: Add new sidebar items (Campaigns, Templates, Automations, Analytics, AI Daily Email)
+- [ ] Integration: wire existing subscriber/newsletter forms to new contact system — future enhancement
+- [x] Tests: write vitest tests for campaign, contact, company, automation, analytics routes (161 tests passing)
+
+## Hub Demo Visual Fixes
+- [x] Remove horizontal scrollbar from tab navigation bar
+- [x] Delete ALL secondary/features screenshots from ALL sections (keep only main screenshot per section)
+- [x] Section 6 (Zone & Line Management): Increase image height to match text block (h-[500px])
+- [x] Section 7 (KPI Dashboard): Reduce image height to match text block (max-h-[360px])
+- [x] Section 9 (RTW & Visa Alerts): Increase image height to match text block (h-[520px])
+- [x] Section 14 (Bulk Actions): Reduce image height to match text block (max-h-[360px])
+- [x] Section 16 (Smart Table): Increase image height to match text block (h-[480px])
+- [x] Cleaned up email campaign schema additions from drizzle/schema.ts
+
+## Hub Demo Section Removal
+- [x] Delete section 1 (Run Dashboard) from Hub Demo page
+- [x] Delete section 2 (Unified Inbox) from Hub Demo page
+- [x] Delete section 3 (Compliance Status) from Hub Demo page
+- [x] Delete section 4 (RTW & Calendar) from Hub Demo page
+- [x] Updated hub-demo.test.ts to reflect 12 sections (was 16)
+- [x] Delete section 5 (Sponsored Worker Profiles) from Hub Demo page
+- [x] Delete section 6 (Zone & Line Management) from Hub Demo page
+- [x] Updated hub-demo.test.ts to reflect 10 sections (was 12)
+
+## Hub Demo Section Layout Redesign
+- [x] Redesign section layout: larger image (1.4fr) on left, text block right-aligned and top-aligned
+- [x] Remove module number badge from image area
+- [x] Remove per-section imageHeight overrides — all images now h-auto
+- [x] Apply consistently to all 10 sections
+
+## SendGrid Email Integration
+- [x] Store SendGrid API key as environment variable
+- [x] Build SendGrid email service module (single send, batch send)
+- [x] Build SendGrid webhook handler for delivery events (opens, clicks, bounces, unsubscribes)
+- [x] Wire SendGrid into campaign send/schedule tRPC routes
+- [x] Register webhook endpoint at /api/sendgrid/webhook
+- [x] Update Campaign Builder UI to trigger real email sends (send, schedule, test email)
+- [x] Write vitest test to validate SendGrid API key (8 tests passing)
+- [x] Import 5,329 GoHighLevel contacts via CSV (5,147 new contacts imported, 88 skipped no email, 9 deduplicated, 79 tags created, 9,632 tag assignments)
+- [ ] Build CSV contact import wizard UI for future imports
+
+## CSV Contact Import Wizard UI
+- [ ] Backend: CSV upload endpoint that parses CSV and returns headers + sample rows
+- [ ] Backend: Field mapping validation and preview route (map CSV columns to contact fields)
+- [ ] Backend: Batch import execution route with deduplication, progress tracking, and error handling
+- [ ] Frontend: Step 1 — Drag-and-drop CSV file upload with file validation
+- [ ] Frontend: Step 2 — Column mapping interface (CSV headers → contact fields) with auto-detect
+- [ ] Frontend: Step 3 — Preview imported data with validation warnings (missing emails, duplicates)
+- [ ] Frontend: Step 4 — Import execution with real-time progress bar and summary report
+- [ ] Frontend: Add Import Contacts button/link to Contacts page in email campaigns admin
+- [ ] Tests: Write vitest tests for CSV import backend routes
+
+## Fix: Contacts & Companies Not Visible in Admin Panel
+- [x] Fix: CRM Contacts page only shows test data, not the 5,400+ imported GHL contacts
+- [x] Build: All Contacts page in Email Campaigns admin with search, filter, pagination, bulk actions
+- [x] Build: CSV Import Wizard UI (drag-and-drop upload, field mapping, preview, import execution)
+- [x] Fix: Companies page shows empty — populate 565 companies from imported contact data
+- [x] Add: "All Contacts" and "Import Contacts" nav items to Email Campaigns sidebar
+- [x] Clean up: Removed 27 duplicate test contact lists from database
+- [x] Tests: Write 11 vitest tests for contacts list, stats, bulkImport, and auth (all 180 tests pass)
+
+## Database Cleanup
+- [x] Delete 192 seed/test contacts from database (example.com and test- email patterns)
+- [x] Delete Test Corp seed company from database
+
+## Fix: Contact Profile & Tags-to-Lists Conversion
+- [ ] Fix contact profile page header/banner overlap cutting off name
+- [ ] Convert 81 contact tags into contact lists with member counts
+- [ ] Verify Contact Lists page shows converted lists with correct member counts
+
+## CRM Enhancements: Pipeline, Companies, Phone Numbers
+- [x] Add phone number display to contact profile and contacts table
+- [x] Make company name clickable on contact profile — navigates to company page
+- [x] Add Companies page to Email Campaigns sidebar under Audience
+- [x] Create deals/pipeline schema (deal stages, pipeline, deal values, product, probability)
+- [x] Build Pipeline page with Kanban board view, deal stages, and revenue forecast calculator
+- [x] Add revenue forecast/calculator based on products (6 product types) and deal stages
+- [x] Add Pipeline (under Sales) and Companies (under Audience) to sidebar navigation
+- [x] Write 15 vitest tests for deals CRUD, stats, companies list/getById/getContacts/getDeals (all 195 tests pass)
+
+## Custom Properties, Manual Add, & Smart Enrichment
+- [x] Create custom properties schema (customProperties + propertyValues tables)
+- [x] Build backend routes for managing custom properties (CRUD + bulk set values)
+- [x] Add "Add Contact" button and slide-over form dialog to All Contacts page
+- [x] Add "Add Company" button and slide-over form dialog to Companies page
+- [x] Build smart enrichment backend (LLM-powered web data lookup for contacts/companies)
+- [x] Integrate enrichment button into contact create form with auto-populate
+- [x] Integrate enrichment button into company create form with auto-populate
+- [x] Custom properties integrated into Add Contact dialog
+- [x] Write 12 vitest tests for enrichment, custom properties CRUD, and company create (all 207 pass, 3 pre-existing booking failures)
+
+## Comprehensive CRM Improvements (Batch)
+- [x] Fix dashboard subscriber count to show actual 5,247 contacts not 39
+- [x] Remove remaining seed contacts (Jane Smith, John Doe, Subscriber test entries) — already cleaned
+- [x] Remove empty test lists (Updated List Name, Fetch List, Test List with 0 contacts) — already cleaned
+- [x] Remove test campaigns (Updated Campaign Name, Fetch Test Campaign, Test Campaign) — already cleaned
+- [x] Reorder sidebar: All Contacts → Contacts (with Lists tab inside) → Companies
+- [x] Make contact lists clickable — navigate to list members view
+- [x] Add list/table view toggle for Contact Lists
+- [x] Add list/table view toggle for Sales Pipeline
+- [x] Add avatar/picture upload on contact header
+- [x] Add avatar/picture upload on company header
+- [x] Add send email feature from Companies page
+- [x] Sort companies alphabetically by default
+- [x] Build revenue calculator with per-product pricing, per-item discount, and offers line
+- [x] Write 8 vitest tests for CRM features (avatar upload, contacts/companies update, deals pipeline, access control, stats)
+
+## Booking Appointment Fixes
+- [x] Fix: New bookings should appear first in the list (most recent at top), not second
+- [x] Fix: Send confirmation email to the customer after booking an appointment
+- [x] Fix: Auto-create contact record when a booking is made if contact doesn't exist
+- [x] Fix: Auto-create company record when a booking is made if company doesn't exist
+- [x] Tests: Write 9 vitest tests for booking fixes (all passing)

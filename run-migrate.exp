@@ -1,0 +1,19 @@
+#!/usr/bin/expect -f
+set timeout 120
+spawn npx drizzle-kit generate
+# For every prompt, just press Enter to accept the default (create column)
+expect {
+    -re "Is .* created or renamed" {
+        send "\r"
+        exp_continue
+    }
+    -re "Is .* table created or renamed" {
+        send "\r"
+        exp_continue
+    }
+    -re "\\?" {
+        send "\r"
+        exp_continue
+    }
+    eof
+}
