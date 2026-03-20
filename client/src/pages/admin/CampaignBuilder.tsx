@@ -9,7 +9,7 @@ import {
   Link2, Share2, MessageSquare, Quote, Calendar, Podcast, Newspaper,
   GripVertical, Eye, Smartphone, Monitor, Moon, Send, Clock,
   AlertTriangle, ChevronDown, ChevronUp, ExternalLink, Sparkles,
-  RotateCcw, CheckCircle2, PlusCircle, X,
+  RotateCcw, CheckCircle2, PlusCircle, X, Code2,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -118,6 +118,8 @@ export default function CampaignBuilder({ onNavigate, editId }: { onNavigate: (p
   const [aiTone, setAiTone] = useState<"professional" | "friendly" | "urgent" | "educational" | "promotional">("professional");
   const [generatingContent, setGeneratingContent] = useState(false);
   const [aiGeneratedBlocks, setAiGeneratedBlocks] = useState<EmailBlock[] | null>(null);
+  const [showHtmlPaste, setShowHtmlPaste] = useState(false);
+  const [pastedHtml, setPastedHtml] = useState("");
 
   const { data: existingCampaign } = trpc.emailCampaign.campaigns.getById.useQuery(
     { id: editId! },
@@ -680,78 +682,8 @@ export default function CampaignBuilder({ onNavigate, editId }: { onNavigate: (p
             </div>
           </div>
 
-          {/* Right Sidebar - AI + Block Palette + Quick Links */}
+          {/* Right Sidebar - Block Palette + Quick Links */}
           <div className="space-y-4">
-            {/* AI Assistant */}
-            <div className="bg-gradient-to-br from-[#0f172a] to-[#1e293b] rounded-xl shadow-sm p-4 border border-[#1B3A5C]/30">
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
-                  <Sparkles className="w-4 h-4 text-white" />
-                </div>
-                <h3 className="font-semibold text-white text-sm">AI Assistant</h3>
-              </div>
-              <textarea
-                value={aiPrompt}
-                onChange={e => setAiPrompt(e.target.value)}
-                placeholder="Describe the email you want, e.g. 'A newsletter about the latest Home Office compliance changes with a CTA to book an audit'"
-                className="w-full rounded-lg bg-white/10 border border-white/10 text-white placeholder-slate-400 text-xs p-2.5 resize-none focus:outline-none focus:ring-2 focus:ring-violet-500/40"
-                rows={3}
-              />
-              <div className="mt-2">
-                <label className="block text-[10px] text-slate-400 mb-1">Tone</label>
-                <select
-                  value={aiTone}
-                  onChange={e => setAiTone(e.target.value as any)}
-                  className="w-full rounded-lg bg-white/10 border border-white/10 text-white text-xs px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-violet-500/40 [&>option]:text-[#1F2937]"
-                >
-                  <option value="professional">Professional</option>
-                  <option value="friendly">Friendly</option>
-                  <option value="urgent">Urgent</option>
-                  <option value="educational">Educational</option>
-                  <option value="promotional">Promotional</option>
-                </select>
-              </div>
-              <button
-                onClick={handleGenerateContent}
-                disabled={generatingContent || !aiPrompt.trim()}
-                className="w-full mt-3 flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white text-xs font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {generatingContent ? (
-                  <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Generating...</>
-                ) : (
-                  <><Sparkles className="w-3.5 h-3.5" /> Generate Email Content</>
-                )}
-              </button>
-              {aiGeneratedBlocks && (
-                <div className="mt-3 space-y-2">
-                  <div className="flex items-center gap-1.5">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                    <span className="text-emerald-400 text-[10px] font-medium">{aiGeneratedBlocks.length} blocks generated</span>
-                  </div>
-                  <div className="flex gap-1.5">
-                    <button
-                      onClick={() => handleApplyAiContent("replace")}
-                      className="flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 text-[10px] font-medium transition-colors"
-                    >
-                      <RotateCcw className="w-3 h-3" /> Replace All
-                    </button>
-                    <button
-                      onClick={() => handleApplyAiContent("append")}
-                      className="flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 text-[10px] font-medium transition-colors"
-                    >
-                      <PlusCircle className="w-3 h-3" /> Append
-                    </button>
-                    <button
-                      onClick={() => setAiGeneratedBlocks(null)}
-                      className="flex items-center justify-center px-2 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 text-[10px] font-medium transition-colors"
-                    >
-                      <X className="w-3 h-3" />
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-
             {/* Add Blocks */}
             <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
               <h3 className="font-semibold text-[#1F2937] text-sm mb-3">Add Block</h3>
@@ -813,6 +745,193 @@ export default function CampaignBuilder({ onNavigate, editId }: { onNavigate: (p
               )}
             </div>
           </div>
+        </div>
+
+        {/* AI Content Generator — full width below editor */}
+        <div className="bg-gradient-to-br from-[#0f172a] to-[#1e293b] rounded-xl shadow-sm p-6 border border-[#1B3A5C]/30">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
+              <Sparkles className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-white text-base" style={{ fontFamily: "'DM Sans', sans-serif" }}>AI Content Generator</h3>
+              <p className="text-slate-400 text-xs">Describe what you want and AI will generate the email blocks for your approval</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_180px_auto] gap-3 items-end">
+            <div>
+              <label className="block text-xs text-slate-300 mb-1.5">What should this email be about?</label>
+              <textarea
+                value={aiPrompt}
+                onChange={e => setAiPrompt(e.target.value)}
+                placeholder="e.g. 'A newsletter about the latest Home Office compliance changes, include a testimonial and CTA to book a free audit'"
+                className="w-full rounded-lg bg-white/10 border border-white/10 text-white placeholder-slate-400 text-sm p-3 resize-none focus:outline-none focus:ring-2 focus:ring-violet-500/40"
+                rows={2}
+              />
+            </div>
+            <div>
+              <label className="block text-xs text-slate-300 mb-1.5">Tone</label>
+              <select
+                value={aiTone}
+                onChange={e => setAiTone(e.target.value as any)}
+                className="w-full rounded-lg bg-white/10 border border-white/10 text-white text-sm px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-violet-500/40 [&>option]:text-[#1F2937]"
+              >
+                <option value="professional">Professional</option>
+                <option value="friendly">Friendly</option>
+                <option value="urgent">Urgent</option>
+                <option value="educational">Educational</option>
+                <option value="promotional">Promotional</option>
+              </select>
+            </div>
+            <button
+              onClick={handleGenerateContent}
+              disabled={generatingContent || !aiPrompt.trim()}
+              className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white text-sm font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed h-[42px]"
+            >
+              {generatingContent ? (
+                <><Loader2 className="w-4 h-4 animate-spin" /> Generating...</>
+              ) : (
+                <><Sparkles className="w-4 h-4" /> Generate</>
+              )}
+            </button>
+          </div>
+          {aiGeneratedBlocks && (
+            <div className="mt-4 flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/10">
+              <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+              <span className="text-emerald-400 text-sm font-medium">{aiGeneratedBlocks.length} blocks generated</span>
+              <div className="flex gap-2 ml-auto">
+                <Button
+                  onClick={() => handleApplyAiContent("replace")}
+                  className="bg-emerald-500 hover:bg-emerald-600 text-white text-xs gap-1.5 h-8"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" /> Replace All
+                </Button>
+                <Button
+                  onClick={() => handleApplyAiContent("append")}
+                  variant="outline"
+                  className="border-blue-400/30 text-blue-400 hover:bg-blue-500/10 text-xs gap-1.5 h-8"
+                >
+                  <PlusCircle className="w-3.5 h-3.5" /> Append
+                </Button>
+                <button
+                  onClick={() => setAiGeneratedBlocks(null)}
+                  className="p-1.5 rounded-lg hover:bg-white/10 text-slate-400 transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* HTML Source Code — paste from Manus or other AI */}
+        <div className="bg-white rounded-xl border border-gray-100 shadow-sm">
+          <button
+            onClick={() => setShowHtmlPaste(!showHtmlPaste)}
+            className="flex items-center justify-between w-full p-4"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-gray-100 flex items-center justify-center">
+                <Code2 className="w-5 h-5 text-[#6B7280]" />
+              </div>
+              <div className="text-left">
+                <h3 className="font-semibold text-[#1F2937] text-sm" style={{ fontFamily: "'DM Sans', sans-serif" }}>HTML Source Code</h3>
+                <p className="text-[#9CA3AF] text-xs">Paste HTML from Manus, ChatGPT, or any other source</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              {blocks.some(b => b.type === "text" && b.content.html && b.content.html.length > 50) && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="text-xs gap-1.5 h-7"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const html = generateHtmlFromBlocks(blocks);
+                    navigator.clipboard.writeText(html);
+                    toast.success("HTML copied to clipboard");
+                  }}
+                >
+                  Copy HTML
+                </Button>
+              )}
+              {showHtmlPaste ? <ChevronUp className="w-4 h-4 text-[#9CA3AF]" /> : <ChevronDown className="w-4 h-4 text-[#9CA3AF]" />}
+            </div>
+          </button>
+          {showHtmlPaste && (
+            <div className="px-4 pb-4 space-y-3">
+              <textarea
+                value={pastedHtml}
+                onChange={e => setPastedHtml(e.target.value)}
+                placeholder="<!DOCTYPE html>&#10;<html>&#10;  <body>&#10;    Paste your full email HTML here...&#10;  </body>&#10;</html>"
+                className="w-full rounded-lg border border-gray-200 bg-gray-50 text-[#374151] text-xs font-mono p-4 resize-y focus:outline-none focus:ring-2 focus:ring-[#0d9488]/30 focus:border-[#0d9488]"
+                rows={8}
+                spellCheck={false}
+              />
+              <div className="flex items-center gap-3">
+                <Button
+                  onClick={() => {
+                    if (!pastedHtml.trim()) { toast.error("Paste some HTML first"); return; }
+                    setBlocks([{
+                      id: generateId(),
+                      type: "header",
+                      content: { title: "Sponsor ComplIANS" },
+                    }]);
+                    const textBlock: EmailBlock = {
+                      id: generateId(),
+                      type: "text" as const,
+                      content: { html: pastedHtml.trim() },
+                    };
+                    setBlocks([textBlock]);
+                    toast.success("HTML applied — switch to Review to see the full preview");
+                    setPastedHtml("");
+                  }}
+                  className="bg-[#0d9488] hover:bg-[#0d9488]/90 text-white gap-2 text-sm"
+                >
+                  <Check className="w-4 h-4" /> Apply as Full HTML
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    if (!pastedHtml.trim()) { toast.error("Paste some HTML first"); return; }
+                    const newBlock: EmailBlock = {
+                      id: generateId(),
+                      type: "text" as const,
+                      content: { html: pastedHtml.trim() },
+                    };
+                    const footerIdx = blocks.findIndex(b => b.type === "footer");
+                    if (footerIdx > 0) {
+                      const updated = [...blocks];
+                      updated.splice(footerIdx, 0, newBlock);
+                      setBlocks(updated);
+                    } else {
+                      setBlocks([...blocks, newBlock]);
+                    }
+                    toast.success("HTML inserted as a new block");
+                    setPastedHtml("");
+                  }}
+                  className="gap-2 text-sm"
+                >
+                  <PlusCircle className="w-4 h-4" /> Insert as Block
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    const html = generateHtmlFromBlocks(blocks);
+                    setPastedHtml(html);
+                    toast.success("Current email HTML loaded into editor");
+                  }}
+                  className="gap-2 text-sm ml-auto"
+                >
+                  <Code2 className="w-4 h-4" /> Copy Current HTML
+                </Button>
+              </div>
+              <p className="text-[10px] text-[#9CA3AF]">
+                <strong>Apply as Full HTML</strong> replaces all blocks with your pasted HTML.
+                <strong className="ml-1">Insert as Block</strong> adds it as a new content block before the footer.
+              </p>
+            </div>
+          )}
         </div>
       )}
 
