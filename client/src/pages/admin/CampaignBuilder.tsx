@@ -514,6 +514,7 @@ export default function CampaignBuilder({ onNavigate, editId }: { onNavigate: (p
 
       {/* Step 2: Design */}
       {step === 2 && (
+        <div className="space-y-6">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6">
           {/* Email Editor */}
           <div className="space-y-4">
@@ -932,6 +933,7 @@ export default function CampaignBuilder({ onNavigate, editId }: { onNavigate: (p
               </p>
             </div>
           )}
+        </div>
         </div>
       )}
 
