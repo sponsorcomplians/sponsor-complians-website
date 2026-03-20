@@ -4,7 +4,11 @@
   "installCommand": "pnpm install",
   "framework": null,
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/index.js" },
+    { "source": "/api/trpc/(.*)", "destination": "/api" },
+    { "source": "/api/oauth/(.*)", "destination": "/api" },
+    { "source": "/api/stripe/(.*)", "destination": "/api" },
+    { "source": "/api/sendgrid/(.*)", "destination": "/api" },
+    { "source": "/api/booking/(.*)", "destination": "/api" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
