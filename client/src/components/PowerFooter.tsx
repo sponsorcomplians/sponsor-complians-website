@@ -2,8 +2,8 @@ import { Link } from "wouter";
 import { Mail, MapPin } from "lucide-react";
 import { IMAGES } from "@/lib/images";
 import { Phone } from "lucide-react";
+import { SignInButton } from "@clerk/react";
 import { useAuth } from "@/_core/hooks/useAuth";
-import { getLoginUrl } from "@/const";
 
 function AuthFooterLink() {
   const { user, isAuthenticated } = useAuth();
@@ -16,9 +16,11 @@ function AuthFooterLink() {
   }
   if (!isAuthenticated) {
     return (
-      <a href={getLoginUrl()} className="text-[#5A7A9A] hover:text-[#8B9EB7] text-xs transition-colors">
-        Log In
-      </a>
+      <SignInButton mode="modal">
+        <button className="text-[#5A7A9A] hover:text-[#8B9EB7] text-xs transition-colors">
+          Log In
+        </button>
+      </SignInButton>
     );
   }
   return null;

@@ -1,5 +1,5 @@
 import { useAuth } from "@/_core/hooks/useAuth";
-import { getLoginUrl } from "@/const";
+import { SignInButton } from "@clerk/react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
@@ -57,9 +57,11 @@ export default function EmailCampaignAdmin() {
         <div className="text-center max-w-md p-8 bg-white rounded-2xl shadow-sm border border-gray-100">
           <h1 className="text-2xl font-bold text-[#1F2937] mb-4" style={{ fontFamily: "'DM Sans', sans-serif" }}>Admin Access Required</h1>
           <p className="text-[#6B7280] mb-6">Sign in with your admin account to access the email campaign system.</p>
-          <Button onClick={() => { window.location.href = getLoginUrl(); }} className="bg-[#0d9488] hover:bg-[#0d9488]/90 text-white font-medium">
-            Sign In
-          </Button>
+          <SignInButton mode="modal">
+            <Button className="bg-[#0d9488] hover:bg-[#0d9488]/90 text-white font-medium">
+              Sign In
+            </Button>
+          </SignInButton>
         </div>
       </div>
     );
