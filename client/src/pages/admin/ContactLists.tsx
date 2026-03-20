@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import {
   Plus, Users, Trash2, Edit, Loader2, Search, LayoutList, X,
   UserPlus, UserMinus, ArrowLeft, LayoutGrid, List, Mail,
-  Phone, Building2, Eye,
+  Phone, Building2, Eye, Send, Monitor, Smartphone, Moon,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -17,10 +17,42 @@ function ListDetail({ listId, onBack, onNavigate }: {
   onNavigate: (page: string) => void;
 }) {
   const [memberView, setMemberView] = useState<"table" | "grid">("table");
+  const [showTestModal, setShowTestModal] = useState(false);
+  const [showPreviewModal, setShowPreviewModal] = useState(false);
+  const [testEmail, setTestEmail] = useState("");
+  const [testCampaignId, setTestCampaignId] = useState<number | undefined>();
+  const [previewCampaignId, setPreviewCampaignId] = useState<number | undefined>();
+  const [previewDevice, setPreviewDevice] = useState<"desktop" | "mobile" | "dark">("desktop");
+  const [sendingTest, setSendingTest] = useState(false);
+
   const { data: listInfo, isLoading: listLoading } = trpc.emailCampaign.lists.getById.useQuery({ id: listId });
   const { data: members, isLoading: membersLoading } = trpc.emailCampaign.lists.members.useQuery({ listId });
+  const { data: campaignData } = trpc.emailCampaign.campaigns.list.useQuery({ limit: 100 });
+  const { data: previewCampaign } = trpc.emailCampaign.campaigns.getById.useQuery(
+    { id: previewCampaignId! },
+    { enabled: !!previewCampaignId }
+  );
+  const sendTestMutation = trpc.emailCampaign.campaigns.sendTest.useMutation();
   const removeMember = trpc.emailCampaign.lists.removeMember.useMutation();
   const utils = trpc.useUtils();
+
+  const campaigns = campaignData?.items ?? [];
+
+  const handleSendTest = async () => {
+    if (!testCampaignId) { toast.error("Select a campaign first"); return; }
+    if (!testEmail) { toast.error("Enter a test email address"); return; }
+    setSendingTest(true);
+    try {
+      await sendTestMutation.mutateAsync({ campaignId: testCampaignId, testEmail });
+      toast.success(`Test email sent to ${testEmail}`);
+      setShowTestModal(false);
+      setTestEmail("");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to send test email");
+    } finally {
+      setSendingTest(false);
+    }
+  };
 
   const handleRemoveMember = async (contactId: number) => {
     if (!confirm("Remove this contact from the list?")) return;
@@ -66,6 +98,20 @@ function ListDetail({ listId, onBack, onNavigate }: {
             </div>
           </div>
           <div className="flex items-center gap-3">
+            <Button
+              variant="outline"
+              onClick={() => setShowPreviewModal(true)}
+              className="gap-2 text-sm"
+            >
+              <Eye className="w-4 h-4" /> Preview
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => setShowTestModal(true)}
+              className="gap-2 text-sm"
+            >
+              <Send className="w-4 h-4" /> Send Test
+            </Button>
             <Badge variant="outline" className={`text-xs ${list?.isActive ? "bg-emerald-50 text-emerald-600 border-emerald-200" : "bg-slate-50 text-slate-500 border-slate-200"}`}>
               {list?.isActive ? "Active" : "Inactive"}
             </Badge>
@@ -76,6 +122,178 @@ function ListDetail({ listId, onBack, onNavigate }: {
           </div>
         </div>
       </div>
+
+      {/* Send Test Email Modal */}
+      {showTestModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 w-full max-w-md shadow-xl">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-semibold text-[#1F2937]" style={{ fontFamily: "'DM Sans', sans-serif" }}>Send Test Email</h2>
+              <button onClick={() => setShowTestModal(false)} className="p-1 rounded hover:bg-gray-100"><X className="w-4 h-4" /></button>
+            </div>
+            <p className="text-xs text-[#6B7280] mb-4">
+              Send a test email from one of your campaigns to preview how it looks in a real inbox.
+            </p>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-[#374151] mb-1.5">Campaign *</label>
+                <select
+                  value={testCampaignId ?? ""}
+                  onChange={e => setTestCampaignId(e.target.value ? Number(e.target.value) : undefined)}
+                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0d9488]/30"
+                >
+                  <option value="">Select a campaign...</option>
+                  {campaigns.map((c: any) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name} {c.status === "draft" ? "(Draft)" : c.status === "sent" ? "(Sent)" : `(${c.status})`}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-[#374151] mb-1.5">Send To *</label>
+                <Input
+                  type="email"
+                  value={testEmail}
+                  onChange={e => setTestEmail(e.target.value)}
+                  placeholder="your@email.com"
+                />
+                <p className="text-[10px] text-[#9CA3AF] mt-1">The test email will be sent to this address.</p>
+              </div>
+              <div className="flex justify-end gap-3 pt-2">
+                <Button variant="outline" onClick={() => setShowTestModal(false)}>Cancel</Button>
+                <Button
+                  onClick={handleSendTest}
+                  disabled={sendingTest || !testCampaignId || !testEmail}
+                  className="bg-[#0d9488] hover:bg-[#0d9488]/90 text-white gap-2"
+                >
+                  {sendingTest ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                  Send Test
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Preview Campaign Modal */}
+      {showPreviewModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-3xl max-h-[90vh] flex flex-col">
+            <div className="flex items-center justify-between p-4 border-b border-gray-100 shrink-0">
+              <h2 className="font-semibold text-[#1F2937]" style={{ fontFamily: "'DM Sans', sans-serif" }}>Campaign Preview</h2>
+              <button onClick={() => { setShowPreviewModal(false); setPreviewCampaignId(undefined); }} className="p-1 rounded hover:bg-gray-100"><X className="w-4 h-4" /></button>
+            </div>
+            <div className="p-4 border-b border-gray-100 shrink-0 space-y-3">
+              <div>
+                <label className="block text-sm font-medium text-[#374151] mb-1.5">Select Campaign</label>
+                <select
+                  value={previewCampaignId ?? ""}
+                  onChange={e => setPreviewCampaignId(e.target.value ? Number(e.target.value) : undefined)}
+                  className="w-full max-w-sm rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0d9488]/30"
+                >
+                  <option value="">Select a campaign to preview...</option>
+                  {campaigns.map((c: any) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name} {c.status === "draft" ? "(Draft)" : c.status === "sent" ? "(Sent)" : `(${c.status})`}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              {previewCampaignId && (
+                <div className="flex items-center gap-2">
+                  <div className="flex bg-gray-100 rounded-lg p-0.5">
+                    <button
+                      onClick={() => setPreviewDevice("desktop")}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${previewDevice === "desktop" ? "bg-white text-[#1F2937] shadow-sm" : "text-[#6B7280]"}`}
+                    >
+                      <Monitor className="w-3.5 h-3.5" /> Desktop
+                    </button>
+                    <button
+                      onClick={() => setPreviewDevice("mobile")}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${previewDevice === "mobile" ? "bg-white text-[#1F2937] shadow-sm" : "text-[#6B7280]"}`}
+                    >
+                      <Smartphone className="w-3.5 h-3.5" /> Mobile
+                    </button>
+                    <button
+                      onClick={() => setPreviewDevice("dark")}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${previewDevice === "dark" ? "bg-white text-[#1F2937] shadow-sm" : "text-[#6B7280]"}`}
+                    >
+                      <Moon className="w-3.5 h-3.5" /> Dark
+                    </button>
+                  </div>
+                  {previewCampaign && (
+                    <div className="ml-auto text-xs text-[#6B7280]">
+                      <span className="font-medium">Subject:</span> {previewCampaign.subject || "—"}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+            <div className={`flex-1 overflow-auto p-4 ${previewDevice === "dark" ? "bg-[#1a1a2e]" : "bg-[#F5F7FA]"}`}>
+              {!previewCampaignId ? (
+                <div className="text-center py-16">
+                  <Mail className="w-12 h-12 text-[#D1D5DB] mx-auto mb-3" />
+                  <p className="text-[#9CA3AF] text-sm">Select a campaign above to preview</p>
+                </div>
+              ) : !previewCampaign?.contentHtml ? (
+                <div className="text-center py-16">
+                  <Mail className="w-12 h-12 text-[#D1D5DB] mx-auto mb-3" />
+                  <p className="text-[#9CA3AF] text-sm">This campaign has no email content yet</p>
+                </div>
+              ) : (
+                <div className={`mx-auto ${previewDevice === "mobile" ? "max-w-[375px]" : "max-w-[600px]"}`}>
+                  <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+                    {/* Email header bar */}
+                    <div className="px-4 py-3 border-b border-gray-100 bg-gray-50">
+                      <div className="text-xs text-[#6B7280]">
+                        <span className="font-medium text-[#374151]">From:</span> {previewCampaign.fromName || "Sponsor ComplIANS"} &lt;{previewCampaign.fromEmail || "info@sponsorcomplians.com"}&gt;
+                      </div>
+                      <div className="text-xs text-[#6B7280] mt-0.5">
+                        <span className="font-medium text-[#374151]">Subject:</span> {previewCampaign.subject || "(No subject)"}
+                      </div>
+                      {previewCampaign.previewText && (
+                        <div className="text-xs text-[#9CA3AF] mt-0.5">
+                          {previewCampaign.previewText}
+                        </div>
+                      )}
+                    </div>
+                    <iframe
+                      srcDoc={previewCampaign.contentHtml}
+                      title="Email Preview"
+                      className="w-full border-0"
+                      style={{ minHeight: "500px" }}
+                      sandbox="allow-same-origin"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+            <div className="flex items-center justify-between p-4 border-t border-gray-100 shrink-0">
+              <p className="text-xs text-[#9CA3AF]">
+                Preview for list: <span className="font-medium text-[#6B7280]">{list?.name}</span> ({memberList.length} members)
+              </p>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setShowPreviewModal(false);
+                    if (previewCampaignId) {
+                      setTestCampaignId(previewCampaignId);
+                      setShowTestModal(true);
+                    }
+                  }}
+                  disabled={!previewCampaignId}
+                  className="gap-2 text-sm"
+                >
+                  <Send className="w-3.5 h-3.5" /> Send Test
+                </Button>
+                <Button variant="outline" onClick={() => { setShowPreviewModal(false); setPreviewCampaignId(undefined); }}>Close</Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* View Toggle */}
       <div className="flex items-center justify-between">
